@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Typer engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2a2a2f;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #c9c4c4;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        label {
+            font-size: 16px;
+            color: #666;
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            background: #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 16px;
+            color: #333;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            input[type="text"] {
+                font-size: 14px;
+            }
+            li {
+                font-size: 14px;
+            }
+        }
+    </style>
+    <script>
+        function fetchNextWords() {
+            var inputText = document.getElementById('target_word').value.trim();
+            var words = inputText.split(/\s+/);
+            var targetWord = words[words.length - 1];
+            
+            if (targetWord.length > 0) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/get_next_words?target_word=' + encodeURIComponent(targetWord), true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var nextWords = JSON.parse(xhr.responseText);
+                        var suggestionsList = document.getElementById('suggestions');
+                        suggestionsList.innerHTML = '';
+                        nextWords.forEach(function(word) {
+                            var li = document.createElement('li');
+                            li.textContent = word;
+                            suggestionsList.appendChild(li);
+                        });
+                    }
+                };
+                xhr.send();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Keyboard suggestions in real-time</h1>
+        <label for="target_word">Enter words:</label>
+        <input type="text" id="target_word" name="target_word" oninput="fetchNextWords()">
+        <h2>Next Words:</h2>
+        <ul id="suggestions"></ul>
+    </div>
+</body>
+</html>
